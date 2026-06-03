@@ -1,6 +1,6 @@
 ---
 name: grill-with-docs
-description: Grilling session that challenges your plan against the existing domain model, sharpens terminology, and updates documentation (CONTEXT.md, ADRs) inline as decisions crystallise. Use when user wants to stress-test a plan against their project's language and documented decisions.
+description: Grilling session that challenges your plan against the existing domain model, sharpens terminology, and updates the LLM Wiki and ADRs inline as decisions crystallise. Use when the user wants to stress-test a plan against their project's language and documented decisions.
 ---
 
 <what-to-do>
@@ -21,11 +21,17 @@ During codebase exploration, also look for existing documentation:
 
 ### File structure
 
-Most repos have a single context:
+Most repos have the following file structure:
 
 ```
 /
-├── CONTEXT.md
+├── knowledge-base/
+│   ├── raw/
+│   ├── wiki/
+│   │   ├── index.md
+│   │   ├── log.md
+│   │   └── Concept.md
+│   └── instructions.md
 ├── docs/
 │   └── adr/
 │       ├── 0001-event-sourced-orders.md
@@ -33,29 +39,13 @@ Most repos have a single context:
 └── src/
 ```
 
-If a `CONTEXT-MAP.md` exists at the root, the repo has multiple contexts. The map points to where each one lives:
-
-```
-/
-├── CONTEXT-MAP.md
-├── docs/
-│   └── adr/                          ← system-wide decisions
-├── src/
-│   ├── ordering/
-│   │   ├── CONTEXT.md
-│   │   └── docs/adr/                 ← context-specific decisions
-│   └── billing/
-│       ├── CONTEXT.md
-│       └── docs/adr/
-```
-
-Create files lazily — only when you have something to write. If no `CONTEXT.md` exists, create one when the first term is resolved. If no `docs/adr/` exists, create it when the first ADR is needed.
+Create files lazily — only when you have something to write. If no `knowledge-base/` directory exists, initialize it (or ask the user if you should run `init-wiki` to set it up) when the first term or concept is resolved. If no `docs/adr/` exists, create it when the first ADR is needed.
 
 ## During the session
 
 ### Challenge against the glossary
 
-When the user uses a term that conflicts with the existing language in `CONTEXT.md`, call it out immediately. "Your glossary defines 'cancellation' as X, but you seem to mean Y — which is it?"
+When the user uses a term that conflicts with the existing language in the LLM Wiki, call it out immediately. "Your wiki defines 'cancellation' as X, but you seem to mean Y — which is it?"
 
 ### Sharpen fuzzy language
 
@@ -69,11 +59,14 @@ When domain relationships are being discussed, stress-test them with specific sc
 
 When the user states how something works, check whether the code agrees. If you find a contradiction, surface it: "Your code cancels entire Orders, but you just said partial cancellation is possible — which is right?"
 
-### Update CONTEXT.md inline
+### Update LLM Wiki inline
 
-When a term is resolved, update `CONTEXT.md` right there. Don't batch these up — capture them as they happen. Use the format in [CONTEXT-FORMAT.md](./CONTEXT-FORMAT.md).
+When a concept or term is resolved, update the LLM Wiki right there. Don't batch these up — capture them as they happen. Use the format in [WIKI-FORMAT.md](./WIKI-FORMAT.md).
+- Create or update the specific markdown file for the concept under `knowledge-base/wiki/<Concept>.md`.
+- Add or update the concept link and its one-line description in `knowledge-base/wiki/index.md`.
+- Append a log entry to `knowledge-base/wiki/log.md` detailing the ingest or update.
 
-`CONTEXT.md` should be totally devoid of implementation details. Do not treat `CONTEXT.md` as a spec, a scratch pad, or a repository for implementation decisions. It is a glossary and nothing else.
+The wiki pages should be totally devoid of implementation details. Do not treat them as a spec, a scratch pad, or a repository for implementation decisions. They are a domain wiki and glossary.
 
 ### Offer ADRs sparingly
 

@@ -52,14 +52,14 @@ These are my most popular skills. They help you align with the agent before you 
 
 I felt the same tension with my agents. Agents are usually dropped into a project and asked to figure out the jargon as they go. So they use 20 words where 1 will do.
 
-**The Fix** for this is a shared language. It's a document that helps agents decode the jargon used in the project.
+**The Fix** for this is a shared language. Instead of a single `CONTEXT.md` file, we build and maintain a persistent, compounding LLM Wiki (inside the `knowledge-base/` folder) based on [Karpathy's LLM Wiki layout](https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f) to help agents decode the jargon and concepts on the fly.
 
 <details>
 <summary>
 Example
 </summary>
 
-Here's an example [`CONTEXT.md`](https://github.com/mattpocock/course-video-manager/blob/076a5a7a182db0fe1e62971dd7a68bcadf010f1c/CONTEXT.md), from my `course-video-manager` repo. Which one is easier to read?
+Here's how a shared vocabulary pays off:
 
 - **BEFORE**: "There's a problem when a lesson inside a section of a course is made 'real' (i.e. given a spot in the file system)"
 - **AFTER**: "There's a problem with the materialization cascade"
@@ -68,7 +68,7 @@ This concision pays off session after session.
 
 </details>
 
-This is built into [`/grill-with-docs`](./skills/engineering/grill-with-docs/SKILL.md). It's a grilling session, but that helps you build a shared language with the AI, and document hard-to-explain decisions in ADR's.
+This is built into [`/grill-with-docs`](./skills/engineering/grill-with-docs/SKILL.md). It's a grilling session that helps you build and maintain a shared language with the AI as a wiki, and document hard-to-explain decisions in ADRs.
 
 It's hard to explain how powerful this is. It might be the single coolest technique in this repo. Try it, and see.
 
@@ -129,9 +129,10 @@ Software engineering fundamentals matter more than ever. These skills are my bes
 Skills I use daily for code work.
 
 - **[diagnose](./skills/engineering/diagnose/SKILL.md)** — Disciplined diagnosis loop for hard bugs and performance regressions: reproduce → minimise → hypothesise → instrument → fix → regression-test.
-- **[grill-with-docs](./skills/engineering/grill-with-docs/SKILL.md)** — Grilling session that challenges your plan against the existing domain model, sharpens terminology, and updates `CONTEXT.md` and ADRs inline.
+- **[grill-with-docs](./skills/engineering/grill-with-docs/SKILL.md)** — Grilling session that challenges your plan against the existing domain model, sharpens terminology, and updates the LLM Wiki and ADRs inline.
 - **[triage](./skills/engineering/triage/SKILL.md)** — Triage issues through a state machine of triage roles.
-- **[improve-codebase-architecture](./skills/engineering/improve-codebase-architecture/SKILL.md)** — Find deepening opportunities in a codebase, informed by the domain language in `CONTEXT.md` and the decisions in `docs/adr/`.
+- **[improve-codebase-architecture](./skills/engineering/improve-codebase-architecture/SKILL.md)** — Find deepening opportunities in a codebase, informed by the domain language in the LLM Wiki and the decisions in `docs/adr/`.
+- **[init-wiki](./skills/engineering/init-wiki/SKILL.md)** — Initialize a persistent, compounding LLM Wiki knowledge base (the `knowledge-base/` directory) inside the current repository.
 - **[setup-nestor-skills](./skills/engineering/setup-nestor-skills/SKILL.md)** — Scaffold the per-repo config (issue tracker, triage label vocabulary, domain doc layout) that the other engineering skills consume. Run once per repo before using `to-issues`, `to-prd`, `triage`, `diagnose`, `tdd`, `improve-codebase-architecture`, or `zoom-out`.
 - **[tdd](./skills/engineering/tdd/SKILL.md)** — Test-driven development with a red-green-refactor loop. Builds features or fixes bugs one vertical slice at a time.
 - **[to-issues](./skills/engineering/to-issues/SKILL.md)** — Break any plan, spec, or PRD into independently-grabbable GitHub issues using vertical slices.
