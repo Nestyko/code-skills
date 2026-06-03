@@ -9,7 +9,7 @@ Skills for Engineering AI Workflow, enforce best practices and scale with AI.
 1. Run the skills.sh installer:
 
 ```bash
-npx skills@latest add mattpocock/skills
+npx skills@latest add nestyko/skills
 ```
 
 2. Pick the skills you want, and which coding agents you want to install them on. **Make sure you select `/setup-nestor-skills`**.
