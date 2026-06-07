@@ -1,6 +1,6 @@
 ---
 name: setup-nestor-skills
-description: Sets up an `## Agent skills` block in AGENTS.md/CLAUDE.md and `docs/agents/` so the engineering skills know this repo's issue tracker (GitHub or local markdown), triage label vocabulary, and domain doc layout. Run before first use of `to-issues`, `to-prd`, `triage`, `diagnose`, `tdd`, `improve-codebase-architecture`, or `zoom-out` — or if those skills appear to be missing context about the issue tracker, triage labels, or domain docs.
+description: Sets up an `## Agent skills` block in the project's agent instructions file (`AGENTS.md`, or `CLAUDE.md` if it already exists) and `docs/agents/` so the engineering skills know this repo's issue tracker (GitHub or local markdown), triage label vocabulary, domain doc layout, and the LLM Wiki location. Run before first use of `to-issues`, `to-prd`, `triage`, `diagnose`, `tdd`, `improve-codebase-architecture`, or `zoom-out` — or if those skills appear to be missing context about the issue tracker, triage labels, or domain docs.
 disable-model-invocation: true
 ---
 
@@ -21,8 +21,8 @@ This is a prompt-driven skill, not a deterministic script. Explore, present what
 Look at the current repo to understand its starting state. Read whatever exists; don't assume:
 
 - `git remote -v` and `.git/config` — is this a GitHub repo? Which one?
-- `AGENTS.md` and `CLAUDE.md` at the repo root — does either exist? Is there already an `## Agent skills` section in either?
-- `knowledge-base/` directory (LLM Wiki) at the repo root
+- `AGENTS.md` and `CLAUDE.md` at the repo root — which one exists? (If both exist, `CLAUDE.md` wins — see step 4.) Is there already an `## Agent skills` section in the file that will be edited?
+- The LLM Wiki directory at the repo root (default `knowledge-base/`) — does it exist?
 - `docs/adr/` and any `src/*/docs/adr/` directories
 - `docs/agents/` — does this skill's prior output already exist?
 - `.scratch/` — sign that a local-markdown issue tracker convention is already in use
@@ -61,33 +61,35 @@ Default: each role's string equals its name. Ask the user if they want to overri
 
 **Section C — Domain docs.**
 
-> Explainer: Some skills (`improve-codebase-architecture`, `diagnose`, `tdd`) read the LLM Wiki in `knowledge-base/` to learn the project's domain language, and `docs/adr/` for past architectural decisions.
+> Explainer: Some skills (`improve-codebase-architecture`, `diagnose`, `tdd`) read the LLM Wiki to learn the project's domain language, and `docs/adr/` for past architectural decisions. The LLM Wiki is a directory of markdown files the project maintains as its source of truth for concepts and entities.
 
-Confirm setup:
-- Propose configuring the LLM Wiki at the root (`knowledge-base/` directory) and ADRs under `docs/adr/`.
+Confirm setup — two questions, in order:
+
+1. **LLM Wiki location.** Ask the user where the LLM Wiki lives in this repo. The default is `./knowledge-base` at the repo root (so absolute-from-repo paths like `knowledge-base/wiki/index.md`). If the user has put it somewhere else (e.g. `./docs/wiki`, `~/some-shared/team-wiki`, a path outside the repo), capture the path as they want it written into `AGENTS.md` — relative paths are interpreted from the repo root, absolute paths are taken as-is. The chosen path is stored in the config and substituted into both the `AGENTS.md` block and `docs/agents/domain.md`.
+2. **ADRs.** Default to `docs/adr/` at the repo root. Ask the user only if the explore step turned up an existing `adr/` directory somewhere non-standard.
 
 ### 3. Confirm and edit
 
 Show the user a draft of:
 
-- The `## Agent skills` block to add to whichever of `CLAUDE.md` / `AGENTS.md` is being edited (see step 4 for selection rules)
-- The contents of `docs/agents/issue-tracker.md`, `docs/agents/triage-labels.md`, `docs/agents/domain.md`
+- The `## Agent skills` block to add to `AGENTS.md` (with the wiki path from Section C substituted into the Domain docs subsection)
+- The contents of `docs/agents/issue-tracker.md`, `docs/agents/triage-labels.md`, `docs/agents/domain.md` (with the wiki path substituted into `domain.md`)
 
 Let them edit before writing.
 
 ### 4. Write
 
-**Pick the file to edit:**
+**Edit the agent instructions file:**
 
-- If `CLAUDE.md` exists, edit it.
-- Else if `AGENTS.md` exists, edit it.
-- If neither exists, ask the user which one to create — don't pick for them.
+- If `CLAUDE.md` exists, use it.
+- Otherwise use `AGENTS.md` (create it with the `## Agent skills` block as its only content if it doesn't exist).
+- Pick deterministically — do not ask the user.
 
-Never create `AGENTS.md` when `CLAUDE.md` already exists (or vice versa) — always edit the one that's already there.
+Never create `AGENTS.md` when `CLAUDE.md` already exists (or vice versa) — always edit the one that's already there. Never create `CLAUDE.md` in any case — it's the user's file, only edit it if it's already there.
 
 If an `## Agent skills` block already exists in the chosen file, update its contents in-place rather than appending a duplicate. Don't overwrite user edits to the surrounding sections.
 
-The block:
+The block (substitute the wiki path from Section C where you see `[wiki-path]`):
 
 ```markdown
 ## Agent skills
@@ -102,7 +104,7 @@ The block:
 
 ### Domain docs
 
-The LLM Wiki is located under `knowledge-base/` at the root. See `docs/agents/domain.md`.
+The LLM Wiki is located under `[wiki-path]` at the repo root (e.g. `[wiki-path]/wiki/index.md`, `[wiki-path]/wiki/<Concept>.md`). See `docs/agents/domain.md`.
 ```
 
 Then write the three docs files using the seed templates in this skill folder as a starting point:
@@ -112,10 +114,10 @@ Then write the three docs files using the seed templates in this skill folder as
 - [issue-tracker-local.md](./issue-tracker-local.md) — local-markdown issue tracker
 - [issue-tracker-beads.md](./issue-tracker-beads.md) — Beads issue tracker
 - [triage-labels.md](./triage-labels.md) — label mapping
-- [domain.md](./domain.md) — domain doc consumer rules + layout
+- [domain.md](./domain.md) — domain doc consumer rules + layout. **Substitute the wiki path from Section C** for every occurrence of `knowledge-base/` before writing — the seed template hardcodes the default path.
 
 For "other" issue trackers, write `docs/agents/issue-tracker.md` from scratch using the user's description.
 
 ### 5. Done
 
-Tell the user the setup is complete and which engineering skills will now read from these files. Mention they can edit `docs/agents/*.md` directly later — re-running this skill is only necessary if they want to switch issue trackers or restart from scratch.
+Tell the user the setup is complete and **name the file you wrote to** (`AGENTS.md` or `CLAUDE.md`) so they know where the `## Agent skills` block lives. Mention they can edit `docs/agents/*.md` directly later — re-running this skill is only necessary if they want to switch issue trackers or restart from scratch.
